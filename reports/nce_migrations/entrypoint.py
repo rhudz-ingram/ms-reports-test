@@ -19,9 +19,8 @@ HEADERS = [
     'Provider Name',
 ]
 
-# This report is only valid for the NCE Commercial product in development
-# and production environments.
-NCE_COMMERCIAL_PRODUCTS = ['PRD-814-505-018', 'PRD-183-233-565']
+# This report is only valid for the NCE Commercial product in development and production environments.
+NCE_COMMERCIAL_PRODUCTS = ['PRD-183-233-565', 'PRD-814-505-018']
 MIGRATION_TYPE_VALUE = 'CSPNCEMIGRATION'
 
 
@@ -43,7 +42,7 @@ def generate(
         progress_callback(progress, total)
 
     for request in requests:
-        # Filtering the parameter value directly as the client query returns timeout error when trying to filter by value
+        # Filtering the parameter value directly as the client query returns timeout error
         params = get_value(request, ['asset', 'params'])
         migration_type = parameter_value('migration_type', params, None)
         if not migration_type:
@@ -84,6 +83,7 @@ def _get_request_list(client, parameters):
 def _process_line(request):
     params = get_value(request, ['asset', 'params'])
     item = get_value(request, ['asset', 'items', 0])
+    # Split MPN like ABC222C0LH1S:0001_P1Y:Annual
     mpn = item['mpn'].split('_')[0].split(':')
 
     migration_date = convert_to_datetime(request['effective_date'])
@@ -109,5 +109,4 @@ def _process_line(request):
         subscription_id,
         provider_name,
     )
-
     return row

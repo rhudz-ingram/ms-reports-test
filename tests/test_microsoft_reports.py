@@ -3,49 +3,15 @@
 # Copyright (c) 2021, Ingram Micro
 # All rights reserved.
 #
-import json
-import os
-
 from reports.nce_promos.entrypoint import generate, HEADERS
 from reports.nce_migrations.entrypoint import generate as generate_migrations
+
+from tests.test_utils import data_migration_requests
 
 TIER_RQL_TA_2 = 'and(eq(product.id,PRD-814-505-018),eq(account.id,TA-2))'
 TIER_RQL_TA_1 = 'and(eq(product.id,PRD-814-505-018),eq(account.id,TA-1))'
 AFTER_DATE = '2021-12-01T00:00:00'
 BEFORE_DATE = '2021-12-20T00:00:00'
-
-def test_nce_migrations(progress, client_factory, response_factory, ff_request, tc_request):
-    parameters = {
-        'date': {
-            'after': AFTER_DATE,
-            'before': BEFORE_DATE,
-        },
-        'connection_type': {
-            'all': False,
-            'choices': ["test"]},
-        'marketplaces': {
-            'all': True,
-            'choices': [],
-        }
-    }
-
-    with open(os.path.dirname(__file__) + '/fixtures/migration_requests.json') as request:
-        migration_requests = json.load(request)
-
-    responses = [response_factory(count=1),
-        response_factory(query='and(eq(type,purchase),'
-               'eq(status,approved),'
-               'in(asset.product.id,(PRD-814-505-018,PRD-183-233-565)),'
-               'in(asset.connection.type,(test)),'
-               f'ge(updated,{AFTER_DATE}),'
-               f'le(updated,{BEFORE_DATE}))',
-            value=migration_requests)
-    ]
-
-    client = client_factory(responses)
-    result = list(generate_migrations(client, parameters, progress))
-
-    assert len(result) == 1
 
 
 def test_nce_promos(progress, client_factory, response_factory, ff_request, tc_request):
@@ -86,8 +52,8 @@ def test_nce_promos(progress, client_factory, response_factory, ff_request, tc_r
 
     assert len(result) == 2
 
-def test_generate_csv_rendered(progress, client_factory, response_factory,
-                               ff_request, tc_request):
+
+def test_generate_csv_rendered(progress, client_factory, response_factory, ff_request, tc_request):
     parameters = {
         'date': {
             'after': AFTER_DATE,
@@ -128,8 +94,8 @@ def test_generate_csv_rendered(progress, client_factory, response_factory,
     assert len(result) == 3
     assert result[0] == HEADERS
 
-def test_generate_json_render(progress, client_factory, response_factory,
-                              ff_request, tc_request):
+
+def test_generate_json_render(progress, client_factory, response_factory, ff_request, tc_request):
     parameters = {
         'date': {
             'after': AFTER_DATE,
@@ -170,8 +136,8 @@ def test_generate_json_render(progress, client_factory, response_factory,
     assert len(result) == 2
     assert result[0]['request_id'] == 'PR-2'
 
-def test_nce_promos_direct_sales_model(progress, client_factory,
-                                       response_factory, ff_request_direct,
+
+def test_nce_promos_direct_sales_model(progress, client_factory, response_factory, ff_request_direct,
                                        tc_request_direct):
     parameters = {
         'date': {
@@ -206,5 +172,37 @@ def test_nce_promos_direct_sales_model(progress, client_factory,
 
     client = client_factory(responses)
     result = list(generate(client, parameters, progress))
+
+    assert len(result) == 1
+
+
+
+def test_nce_migrations(progress, client_factory, response_factory):
+    parameters = {
+        'date': {
+            'after': AFTER_DATE,
+            'before': BEFORE_DATE,
+        },
+        'connection_type': {
+            'all': False,
+            'choices': ["test"]},
+        'marketplaces': {
+            'all': True,
+            'choices': [],
+        }
+    }
+
+    responses = [response_factory(count=1),
+        response_factory(query='and(eq(type,purchase),'
+               'eq(status,approved),'
+               'in(asset.product.id,(PRD-183-233-565,PRD-814-505-018)),'
+               'in(asset.connection.type,(test)),'
+               f'ge(updated,{AFTER_DATE}),'
+               f'le(updated,{BEFORE_DATE}))',
+            value=data_migration_requests())
+    ]
+
+    client = client_factory(responses)
+    result = list(generate_migrations(client, parameters, progress))
 
     assert len(result) == 1
