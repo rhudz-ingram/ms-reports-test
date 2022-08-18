@@ -1,11 +1,11 @@
 {
-  "name": "Microsoft Reports",
+  "name": "[Test] Microsoft Reports",
   "readme_file": "README.md",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "language": "python",
   "reports": [
     {
-      "name": "New Commerce Promotions",
+      "name": "[Test] New Commerce Promotions",
       "readme_file": "reports/nce_promos/README.md",
       "entrypoint": "reports.nce_promos.entrypoint.generate",
       "audience": [
@@ -73,7 +73,7 @@
       ]
     },
     {
-      "name": "New Commerce Migrations",
+      "name": "[Test] New Commerce Migrations",
       "readme_file": "reports/nce_migrations/README.md",
       "entrypoint": "reports.nce_migrations.entrypoint.generate",
       "audience": [
