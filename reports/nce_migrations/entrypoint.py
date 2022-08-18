@@ -43,6 +43,7 @@ def generate(
         progress_callback(progress, total)
 
     for request in requests:
+        # Filtering the parameter value directly as the client query returns timeout error when trying to filter by value
         params = get_value(request, ['asset', 'params'])
         migration_type = parameter_value('migration_type', params, None)
         if not migration_type:
@@ -65,8 +66,6 @@ def _get_request_list(client, parameters):
     query &= R().type.eq('purchase')
     query &= R().status.eq('approved')
     query &= R().asset.product.id.oneof(NCE_COMMERCIAL_PRODUCTS)
-    # query &= R().asset.params.id.eq('migration_type')
-    # query &= R().asset.params.value.eq(MIGRATION_TYPE_VALUE)
 
     if parameters.get('connection_type') and parameters['connection_type']['all'] is False:
         query &= R().asset.connection.type.oneof(parameters['connection_type']['choices'])
