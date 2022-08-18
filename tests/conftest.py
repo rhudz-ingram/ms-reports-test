@@ -148,8 +148,7 @@ def client_factory():
 
 @pytest.fixture
 def ff_request():
-    with open(
-            os.path.dirname(__file__) + '/fixtures/ff_request.json') as request:
+    with open(os.path.dirname(__file__) + '/fixtures/ff_request.json') as request:
         return json.load(request)
 
 

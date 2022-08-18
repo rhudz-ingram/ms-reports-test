@@ -30,7 +30,7 @@ def generate(
         parameters=None,
         progress_callback=None,
         renderer_type=None,
-        extra_context_callback=None,
+        extra_cntext_callback=None,
 ):
     requests = _get_request_list(client, parameters)
 
@@ -43,6 +43,11 @@ def generate(
         progress_callback(progress, total)
 
     for request in requests:
+        params = get_value(request, ['asset', 'params'])
+        migration_type = parameter_value('migration_type', params, None)
+        if not migration_type:
+            continue
+
         if renderer_type == 'json':
             yield {
                 HEADERS[idx].replace(' ', '_').lower(): value
@@ -60,9 +65,9 @@ def _get_request_list(client, parameters):
     query &= R().type.eq('purchase')
     query &= R().status.eq('approved')
     query &= R().asset.product.id.oneof(NCE_COMMERCIAL_PRODUCTS)
-    query &= R().asset.params.id.eq('migration_type')
-    query &= R().asset.params.value.eq(MIGRATION_TYPE_VALUE)
-    
+    # query &= R().asset.params.id.eq('migration_type')
+    # query &= R().asset.params.value.eq(MIGRATION_TYPE_VALUE)
+
     if parameters.get('connection_type') and parameters['connection_type']['all'] is False:
         query &= R().asset.connection.type.oneof(parameters['connection_type']['choices'])
     else:
@@ -70,10 +75,10 @@ def _get_request_list(client, parameters):
 
     if parameters.get('marketplaces') and parameters['marketplaces']['all'] is False:
         query &= R().marketplace.id.oneof(parameters['marketplaces']['choices'])
-    
+
     query &= R().updated.ge(parameters['date']['after'])
     query &= R().updated.le(parameters['date']['before'])
-    
+
     return client.requests.filter(query).order_by("created")
 
 
@@ -105,5 +110,5 @@ def _process_line(request):
         subscription_id,
         provider_name,
     )
-    
+
     return row
