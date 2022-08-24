@@ -18,6 +18,7 @@ HEADERS = [
     'Subscription ID',
     'Provider Name',
     'Connect Subscription ID',
+    'Connect Subscription Status'
     'Marketplace ID',
     'Transaction Type'
 ]
@@ -100,6 +101,7 @@ def _process_line(request):
     subscription_id = parameter_value('subscription_id', params)
     provider_name = get_value(request, ['asset', 'connection', 'provider', 'name'])
     asset_id = get_value(request, ['asset', 'id'])
+    asset_status = get_value(request, ['asset', 'status'])
     marketplace_id = get_value(request, ['marketplace', 'id'])
     transaction_type = get_value(request, ['asset', 'connection', 'type'])
 
@@ -115,6 +117,7 @@ def _process_line(request):
         subscription_id,
         provider_name,
         asset_id,
+        asset_status,
         marketplace_id,
         transaction_type
     )
